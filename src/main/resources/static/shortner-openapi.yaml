@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'URL Shortener Microservice'
+  description: 'A simple URL shortener microservice'
+
+paths:
+  /redirect/{id}:
+    get:
+      operationId: redirectToOriginal
+      summary: Redirect to the original URL
+      description: Fetches the original URL associated with the given short ID and redirects the user to it.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The shortened URL's unique identifier.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Found and redirects to the original URL.
+        '404':
+          description: Short URL not found.
+        '500':
+          description: Internal server error.
+
+  /admin/:
+    get:
+      operationId: listShortenedUrls
+      summary: List all shortened URLs
+      description: Retrieve a list of all saved shortened URLs.
+      responses:
+        '200':
+          description: Successful retrieval of all shortened URLs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortenedURL'
+        '500':
+          description: Internal server error.
+
+    post:
+      operationId: createShortenedUrls
+      summary: Create a new shortened URL
+      description: Save a new shortened URL and its corresponding original URL.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortenedURLCreate'
+      responses:
+        '201':
+          description: Successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortenedURL'
+        '400':
+          description: Bad request.
+        '500':
+          description: Internal server error.
+
+    put:
+      summary: Update a shortened URL
+      operationId: updateShortenedUrls
+      description: Update an existing shortened URL's original URL.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortenedURL'
+      responses:
+        '200':
+          description: Successfully updated.
+        '400':
+          description: Bad request.
+        '404':
+          description: Short URL not found.
+        '500':
+          description: Internal server error.
+
+    delete:
+      summary: Delete a shortened URL
+      operationId: deleteShortenedUrls
+      description: Delete an existing shortened URL.
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: The shortened URL's unique identifier.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted.
+        '404':
+          description: Short URL not found.
+        '500':
+          description: Internal server error.
+
+components:
+  schemas:
+    ShortenedURL:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The shortened URL's unique identifier.
+        originalURL:
+          type: string
+          format: uri
+          description: The original URL that the shortened URL points to.
+
+    ShortenedURLCreate:
+      type: object
+      properties:
+        originalURL:
+          type: string
+          format: uri
+          description: The original URL to be shortened.
+
+

@@ -10,7 +10,6 @@ import java.security.Principal;
 
 import com.robb.shortner.models.ShortenedLink;
 import com.robb.shortner.services.ShortenedLinkService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,14 +33,9 @@ public class AdminControllerTest {
     @MockBean
     private ShortenedLinkService shortenedLinkService;
 
-    @BeforeEach
-    public void setup() {
-        // Setup initial state or reset mocks
-    }
-
     @Test
     @WithMockUser(username = "roberto")
-    public void createShortenedUrls_ValidUrl_ShouldReturnCreated() throws Exception {
+    public void createShortenedUrlsValidUrlShouldReturnCreated() throws Exception {
         ShortenedLink link = new ShortenedLink();
         link.setUrl("http://example.com");
 
@@ -55,7 +49,7 @@ public class AdminControllerTest {
 
     @Test    
     @WithMockUser(username = "roberto")
-    public void deleteShortenedUrls_ValidId_ShouldReturnNoContent() throws Exception {
+    public void deleteShortenedUrlsValidIdShouldReturnNoContent() throws Exception {
         doNothing().when(shortenedLinkService).deleteShortenedLink(anyLong(), any());
 
         mockMvc.perform(delete("/admin/1"))
@@ -64,14 +58,14 @@ public class AdminControllerTest {
 
     @Test
     @WithMockUser(username = "roberto")
-    public void listShortenedUrls_ReturnList_ShouldReturnOk() throws Exception {
+    public void listShortenedUrlsReturnListShouldReturnOk() throws Exception {
         mockMvc.perform(get("/admin"))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "roberto")
-    public void updateShortenedUrls_ValidUpdate_ShouldReturnNoContent() throws Exception {
+    public void updateShortenedUrlsValidUpdate_ShouldReturnNoContent() throws Exception {
         ShortenedLink existingLink = new ShortenedLink();
         existingLink.setId(1L);
         existingLink.setUrl("http://original.com");
@@ -84,9 +78,9 @@ public class AdminControllerTest {
         Principal principal = (Principal) authentication;
 
         when(shortenedLinkService.findShortenedLinkById(1L)).thenReturn(existingLink);
-        when(shortenedLinkService.updateShortenedLink(any(ShortenedLink.class), eq(principal))).thenReturn(updatedLink); // or doNothing() if it's void
+        when(shortenedLinkService.updateShortenedLink(any(ShortenedLink.class), eq(principal))).thenReturn(updatedLink);
     
-        mockMvc.perform(put("/admin/1")
+        mockMvc.perform(put("/admin")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"url\":\"http://updated.com\"}"))
                 .andExpect(status().isNoContent());

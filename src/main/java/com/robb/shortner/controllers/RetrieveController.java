@@ -1,7 +1,5 @@
 package com.robb.shortner.controllers;
 
-import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +15,21 @@ import jakarta.persistence.EntityNotFoundException;
 
 
 @RestController
-@RequestMapping("/r")
-public class ShortenerController {
+@RequestMapping("/retrieve")
+public class RetrieveController {
     
     private final ShortenedLinkService shortenedLinkService;
 
     @Autowired
-    public ShortenerController(ShortenedLinkService shortenedLinkService) {
+    public RetrieveController(ShortenedLinkService shortenedLinkService) {
         this.shortenedLinkService = shortenedLinkService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Void> redirectToOriginal(@PathVariable Long id) {
+    public ResponseEntity<?> retrieveLink(@PathVariable Long id) {
         try {
-            ShortenedLink link = shortenedLinkService.findShortenedLinkById(id);
-            return ResponseEntity.status(HttpStatus.FOUND)
-                                .location(URI.create(link.getUrl()))
-                                .build();
+            final ShortenedLink link = shortenedLinkService.findShortenedLinkById(id);
+            return new ResponseEntity<String>(link.getUrl(), HttpStatus.OK);
         }
         catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

@@ -25,7 +25,6 @@ public class ShortenedLinkService {
         this.shortenedLinkRepository = shortenedLinkRepository;
     }
 
-
     private boolean isValidURL(String urlStr) {
         try {
             new URL(urlStr);
@@ -35,13 +34,10 @@ public class ShortenedLinkService {
         }
     }
 
-
     private boolean isOwner(ShortenedLink link, Principal principal) {
-        return link.getKeycloakUserId() == principal.getName();
+        return link.getKeycloakUserId().equals(principal.getName());
     }
 
-
-    @Transactional
     public ShortenedLink saveShortenedLink(ShortenedLink link) throws IllegalArgumentException {
         if (!isValidURL(link.getUrl())) {
             throw new IllegalArgumentException("Invalid URL");
@@ -58,21 +54,20 @@ public class ShortenedLinkService {
     }
 
     public void deleteShortenedLink(Long id, Principal principal) throws AccessDeniedException, EntityNotFoundException {
-        ShortenedLink link = shortenedLinkRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Shortened Link with id " + id + " not found"));
+        final ShortenedLink link = shortenedLinkRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Shortened Link with id " + id + " not found"));
         if (!isOwner(link, principal)) {
             throw new AccessDeniedException("User " + principal.getName() + " is not authorized to make this request");
         }
         shortenedLinkRepository.deleteById(id);
     }
 
+    @Transactional
     public ShortenedLink updateShortenedLink(ShortenedLink newShortenedLink, Principal principal) throws AccessDeniedException, EntityNotFoundException {
         ShortenedLink existingLink = shortenedLinkRepository.findById(newShortenedLink.getId()).orElseThrow(() -> new EntityNotFoundException("Shortened Link with id " + newShortenedLink.getId() + " not found"));
         if (!isOwner(existingLink, principal)) {
             throw new AccessDeniedException("User " + principal.getName() + " is not authorized to make this request");
         }
         existingLink.setUrl(newShortenedLink.getUrl());
-
         return shortenedLinkRepository.save(existingLink);
     }
-
 }

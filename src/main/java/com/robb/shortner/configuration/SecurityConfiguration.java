@@ -16,8 +16,7 @@ public class SecurityConfiguration {
         http
             .authorizeHttpRequests((authz) -> authz
                 .requestMatchers("/admin/**").authenticated()
-                .requestMatchers("/error/**").authenticated()
-                .requestMatchers("/r/**").permitAll()
+                .requestMatchers("/retrieve/**").permitAll()
             )
             .oauth2Login(Customizer.withDefaults());
 

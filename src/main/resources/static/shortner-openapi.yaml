@@ -5,11 +5,11 @@ info:
   description: 'A simple URL shortener microservice'
 
 paths:
-  /redirect/{id}:
+  /retrieve/{id}:
     get:
-      operationId: redirectToOriginal
-      summary: Redirect to the original URL
-      description: Fetches the original URL associated with the given short ID and redirects the user to it.
+      operationId: retrieveURL
+      summary: Retrieve the original URL
+      description: Fetches the original URL associated with the given short ID and returns it.
       parameters:
         - name: id
           in: path
@@ -18,8 +18,13 @@ paths:
           schema:
             type: string
       responses:
-        '302':
-          description: Found and redirects to the original URL.
+        '200':
+          description: The original URL.
+          content:
+            text/plain:
+                schema:
+                  type: string
+                  example: "https://example.com"
         '404':
           description: Short URL not found.
         '500':
@@ -77,6 +82,8 @@ paths:
           description: Successfully updated.
         '400':
           description: Bad request.
+        '403':
+          description: Forbidden
         '404':
           description: Short URL not found.
         '500':
@@ -98,6 +105,8 @@ paths:
           description: Successfully deleted.
         '404':
           description: Short URL not found.
+        '403':
+          description: Forbidden
         '500':
           description: Internal server error.
 
